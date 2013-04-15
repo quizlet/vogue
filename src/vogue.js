@@ -75,9 +75,9 @@ var walk = function(dir, done) {
 };
 
 function watchAllFiles() {
-  var newFiles = [];
   // watch every file in the whole directory we're put to
   options.webDirectories.forEach(function(dir) {
+  	var newFiles = [];
     walk(dir, function(err, list) {
     	list.forEach(function(file) {
     	  if (!watching[file]) {
@@ -89,10 +89,10 @@ function watchAllFiles() {
 					}
     	  }
     	})
-    	// Newly added files get updated too.
-    	// Not terribly important if 20s delay because for css usually html needs
-    	// to be reloaded.
-    	if (newFiles.length > 0) {
+			// Newly added files get updated too.
+			// Not terribly important if 20s delay because for css usually html needs
+			// to be reloaded.
+			if (newFiles.length > 0) {
 				socket.sockets.emit('update');
 			}
     	console.log('Now watching '+newFiles.length+' new files');
@@ -175,6 +175,12 @@ function getOptions() {
 		      'default': null
         },
         {
+		      name: ['--refresh', '-t'],
+		      type: 'int',
+		      help: 'Milliseconds between checking for updates to file tree (optional)',
+		      'default': 20000
+        },
+        {
           name: ['--help','-h','-?'],
           type: 'flag',
           help: 'Show this help message',
@@ -226,6 +232,5 @@ function getOptions() {
 }
 
 watchAllFiles();
-// refresh file tree every N seconds.
-setInterval(watchAllFiles, 20000);
+setInterval(watchAllFiles, options.refresh);
 
