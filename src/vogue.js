@@ -80,6 +80,12 @@ function watchAllFiles() {
     	    newFiles.push(file);
     	  }
     	})
+    	// Newly added files get updated too.
+    	// Not terribly important if 20s delay because for css usually html needs
+    	// to be reloaded.
+    	if (newFiles.length > 0) {
+				socket.sockets.emit('update');
+			}
     	console.log('Now watching '+newFiles.length+' new files');
     });
   });
