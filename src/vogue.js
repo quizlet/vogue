@@ -142,19 +142,19 @@ function getOptions() {
         {
 		      name: ['--key', '-k'],
 		      type: 'string',
-		      help: 'A private key file (.pem format) (optional)',
+		      help: 'A private key file (.pem or .key format) (optional)',
 		      'default': null
         },
         {
 		      name: ['--cert', '-c'],
 		      type: 'string',
-		      help: 'A certificate file (.pem format) (optional)',
+		      help: 'A certificate file (.pem or .crt format) (optional)',
 		      'default': null
         },
         {
 		      name: ['--ca', '-a'],
 		      type: 'string',
-		      help: 'A intermediate certificate file (.pem format) (optional)',
+		      help: 'A intermediate certificate file (.pem or .crt format) (optional)',
 		      'default': null
         },
         {
