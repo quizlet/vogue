@@ -26,6 +26,12 @@ console.log('Watching directories: ' + options.webDirectories.join(', '));
 console.log('Listening for clients: http://localhost:' + options.port + '/');
 
 var watching = {};
+var css_extensions = [
+		'css'
+	, 'sass'
+	, 'less'
+	, 'styl'
+];
 
 if (options.key !== null) {
   console.log('Listening for SSL clients: https://localhost:' + options.sslPort + '/');
@@ -74,10 +80,13 @@ function watchAllFiles() {
   options.webDirectories.forEach(function(dir) {
     walk(dir, function(err, list) {
     	list.forEach(function(file) {
-    	  if (!Object.prototype.hasOwnProperty.call(watching, file)) {
-    	    fs.watchFile(file, {interval: 2000}, onFileChange.bind(file));
-    	    watching[file] = 'normal';
-    	    newFiles.push(file);
+    	  if (!watching[file]) {
+					var ext = file.split('.').pop();
+					if (css_extensions.indexOf(ext) !== -1) {
+						fs.watchFile(file, {interval: 2000}, onFileChange.bind(file));
+						watching[file] = 'normal';
+						newFiles.push(file);
+					}
     	  }
     	})
     	// Newly added files get updated too.
