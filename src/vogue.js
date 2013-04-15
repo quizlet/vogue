@@ -22,8 +22,10 @@ var options    = getOptions()
 
 server.listen(options.port);
 
-console.log('Watching directory: ' + options.webDirectories.join(', '));
+console.log('Watching directories: ' + options.webDirectories.join(', '));
 console.log('Listening for clients: http://localhost:' + options.port + '/');
+
+var watching = {};
 
 if (options.key !== null) {
   console.log('Listening for SSL clients: https://localhost:' + options.sslPort + '/');
@@ -66,7 +68,6 @@ var walk = function(dir, done) {
   });
 };
 
-var watching = {};
 function watchAllFiles() {
   var newFiles = [];
   // watch every file in the whole directory we're put to
@@ -84,17 +85,12 @@ function watchAllFiles() {
   });
 }
 
-watchAllFiles();
-// refresh file tree every N seconds (TODO: watch directory for new files?)
-setInterval(watchAllFiles, 20000);
-
 function onFileChange(cur, prev) {
 	if (cur.mtime.toString() != prev.mtime.toString()) {
 		socket.sockets.emit('update');
 		if (typeof socket_ssl !== 'undefined') {
 		  socket_ssl.sockets.emit('update');
 		}
-		// not sure why the filename gets turned into an object?
 		var file = this.toString();
 		// put this particular file on high-alert for changes
 		// (reduce the polling interval)
@@ -207,3 +203,8 @@ function getOptions() {
     return dirs;
   }
 }
+
+watchAllFiles();
+// refresh file tree every N seconds.
+setInterval(watchAllFiles, 20000);
+
