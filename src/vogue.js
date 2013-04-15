@@ -86,12 +86,18 @@ function watchAllFiles() {
 }
 
 function onFileChange(cur, prev) {
-	if (cur.mtime.toString() != prev.mtime.toString()) {
+	// Check if file has been deleted.
+	var file = this.toString();
+	if (cur.nlink === 0) {
+		fs.unwatchFile(this);
+		console.log(file + ' has been deleted.');
+		return;
+	}
+	if (cur.mtime.toString() !== prev.mtime.toString()) {
 		socket.sockets.emit('update');
 		if (typeof socket_ssl !== 'undefined') {
 		  socket_ssl.sockets.emit('update');
 		}
-		var file = this.toString();
 		// put this particular file on high-alert for changes
 		// (reduce the polling interval)
 		if (watching[file] === 'normal') {
