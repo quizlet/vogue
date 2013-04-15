@@ -16,13 +16,15 @@ Run the Vogue server.
 
     vogue /path/to/website
 
-Multiple directories can be watched by using separating the paths with colons.
+Multiple directories can be watched by separating the paths with colons.
 (e.g. `vogue /path/to/website:/path/to/second/website`.)
 
-SSL pages are also supported, but a certificate must be provided (see all
-options with `vogue --help`).
+SSL pages are also supported, but a valid certificate must be provided (see
+options).
 
 ### Options
+See all options with `vogue --help`.
+
 * `--port`, `-p`: Port to run the Vogue server on (HTTP). Defaults to 8001.
 * `--ssl_port`, `-s`: Port to run the Vogue server on (HTTPS). Defaults to 8002.
 * `--key`, `-k`: An optional private key file (`.pem` or `.key` format).
@@ -31,8 +33,8 @@ options with `vogue --help`).
 * `--refresh`, `-t`: Number of milliseconds between checking for new files in the file tree. Defaults to 20000 (20 seconds).
 
 ## Demo
-Vogue runs a separate HTTP server to the one running your website.
-To run the demo website, for example, do something like this first:
+Vogue runs a separate HTTP server from the one running your website.
+To run the Vogue demo, do the following:
 
     cd demo
     python -m SimpleHTTPServer
@@ -41,10 +43,10 @@ Then, from another terminal session, run Vogue:
 
     vogue demo
 
-Open http://localhost:8000 (or whatever the port used by your web server is)
-to view the demo index page. The demo page has the Vogue client javascript
-already included. It will connect to the Vogue server watch the two CSS files
-used by the page.
+Open http://localhost:8000 (or the port used by your web server)
+to view the demo. The demo page has the Vogue client javascript
+already included. It will connect to the Vogue server, which watches the two 
+CSS files in the `demo/styles` directory.
 
 Try editing the CSS files in the `demo/styles` directory. When you save, you
 will see a blue dot appear and turn yellow once the page updates to reflect the
