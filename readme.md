@@ -49,7 +49,7 @@ already included. It will connect to the Vogue server, which watches the two
 CSS files in the `demo/styles` directory.
 
 Try editing the CSS files in the `demo/styles` directory. When you save, you
-will see a blue dot appear and turn yellow once the page updates to reflect the
+will see a yellow dot appear and turn blue once the page updates to reflect the
 changes made. This is done without reloading the entire page.
 
 Copyright &copy; 2011 Andrew Davey (andrew@equin.co.uk)
