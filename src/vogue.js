@@ -22,8 +22,17 @@ var options    = getOptions()
 
 server.listen(options.port);
 
-console.log('Watching directory: ' + options.webDirectories.join(', '));
+console.log('Watching directories: ' + options.webDirectories.join(', '));
 console.log('Listening for clients: http://localhost:' + options.port + '/');
+
+var watching = {};
+var css_extensions = [
+		'css'
+	, 'sass'
+	, 'scss'
+	, 'less'
+	, 'styl'
+];
 
 if (options.key !== null) {
   console.log('Listening for SSL clients: https://localhost:' + options.sslPort + '/');
@@ -66,36 +75,45 @@ var walk = function(dir, done) {
   });
 };
 
-var watching = {};
 function watchAllFiles() {
-  var newFiles = [];
   // watch every file in the whole directory we're put to
   options.webDirectories.forEach(function(dir) {
+  	var newFiles = [];
     walk(dir, function(err, list) {
     	list.forEach(function(file) {
-    	  if (!Object.prototype.hasOwnProperty.call(watching, file)) {
-    	    fs.watchFile(file, {interval: 2000}, onFileChange.bind(file));
-    	    watching[file] = 'normal';
-    	    newFiles.push(file);
+    	  if (!watching[file]) {
+					var ext = file.split('.').pop();
+					if (css_extensions.indexOf(ext) !== -1) {
+						fs.watchFile(file, {interval: 2000}, onFileChange.bind(file));
+						watching[file] = 'normal';
+						newFiles.push(file);
+					}
     	  }
     	})
+			// Newly added files get updated too.
+			// Not terribly important if 20s delay because for css usually html needs
+			// to be reloaded.
+			if (newFiles.length > 0) {
+				socket.sockets.emit('update');
+			}
     	console.log('Now watching '+newFiles.length+' new files');
     });
   });
 }
 
-watchAllFiles();
-// refresh file tree every N seconds (TODO: watch directory for new files?)
-setInterval(watchAllFiles, 20000);
-
 function onFileChange(cur, prev) {
-	if (cur.mtime.toString() != prev.mtime.toString()) {
+	var file = this.toString();
+	if (cur.mtime.toString() !== prev.mtime.toString()) {
 		socket.sockets.emit('update');
+		// Check if file has been deleted.
+		if (cur.nlink === 0) {
+			fs.unwatchFile(this);
+			delete watching[file];
+			return;
+		}
 		if (typeof socket_ssl !== 'undefined') {
 		  socket_ssl.sockets.emit('update');
 		}
-		// not sure why the filename gets turned into an object?
-		var file = this.toString();
 		// put this particular file on high-alert for changes
 		// (reduce the polling interval)
 		if (watching[file] === 'normal') {
@@ -142,20 +160,26 @@ function getOptions() {
         {
 		      name: ['--key', '-k'],
 		      type: 'string',
-		      help: 'A private key file (.pem format) (optional)',
+		      help: 'A private key file (.pem or .key format) (optional)',
 		      'default': null
         },
         {
 		      name: ['--cert', '-c'],
 		      type: 'string',
-		      help: 'A certificate file (.pem format) (optional)',
+		      help: 'A certificate file (.pem or .crt format) (optional)',
 		      'default': null
         },
         {
 		      name: ['--ca', '-a'],
 		      type: 'string',
-		      help: 'A intermediate certificate file (.pem format) (optional)',
+		      help: 'A intermediate certificate file (.pem or .crt format) (optional)',
 		      'default': null
+        },
+        {
+		      name: ['--refresh', '-t'],
+		      type: 'int',
+		      help: 'Milliseconds between checking for updates to file tree (optional)',
+		      'default': 20000
         },
         {
           name: ['--help','-h','-?'],
@@ -207,3 +231,7 @@ function getOptions() {
     return dirs;
   }
 }
+
+watchAllFiles();
+setInterval(watchAllFiles, options.refresh);
+
