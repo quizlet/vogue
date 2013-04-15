@@ -29,6 +29,7 @@ var watching = {};
 var css_extensions = [
 		'css'
 	, 'sass'
+	, 'scss'
 	, 'less'
 	, 'styl'
 ];
