@@ -28,6 +28,7 @@ options with `vogue --help`).
 * `--key`, `-k`: An optional private key file (`.pem` or `.key` format).
 * `--cert`, `-c`: An optional certificate file (`.pem` or `.crt` format).
 * `--ca`, `-a`: An optional intermediate certificate file (`.pem` or `.crt` format).
+* `--refresh`, `-t`: Number of milliseconds between checking for new files in the file tree. Defaults to 20000 (20 seconds).
 
 ## Demo
 Vogue runs a separate HTTP server to the one running your website.
